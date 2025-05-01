@@ -46,7 +46,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("email"),
         unique=True
     )
-    first_name = models.CharField(
+    username = models.CharField(
         verbose_name=_("first_name"),
         max_length=150,
         null=True,
