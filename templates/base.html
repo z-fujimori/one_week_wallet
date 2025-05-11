@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}One Week Wallet{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="container">
+                <div class="nav-content">
+                    <a href="{% url 'accounts:index' %}" class="logo">One Week Wallet</a>
+                    <div class="nav-links">
+                        {% if user.is_authenticated %}
+                            <span class="welcome-message">ようこそ、{{ user.username }}さん</span>
+                            <a href="{% url 'accounts:logout' %}" class="nav-link">ログアウト</a>
+                        {% else %}
+                            <a href="{% url 'accounts:login' %}" class="nav-link">ログイン</a>
+                            <a href="{% url 'accounts:signup' %}" class="nav-link">新規登録</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 One Week Wallet. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html> 
