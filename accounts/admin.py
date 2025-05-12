@@ -8,12 +8,12 @@ admin.site.unregister(Group)  # Groupモデルは不要のため非表示にし�
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    ordering = ['account_id']  # ← usernameじゃなくaccount_idで並び替え
-    list_display = ['account_id', 'email', 'is_staff', 'is_active']  # ← 表示項目もカスタム
+    ordering = ['id']  # ← usernameじゃなくaccount_idで並び替え
+    list_display = ['id', 'email', 'is_staff', 'is_active']  # ← 表示項目もカスタム
 
     fieldsets = (
-        (None, {'fields': ('account_id', 'email', 'password')}),
-        ('Personal info', {'fields': ('username', 'last_name', 'birth_date')}),
+        (None, {'fields': ('id', 'email', 'password')}),
+        ('Personal info', {'fields': ('username', 'birth_date')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'created_at', 'updated_at')}),
     )
@@ -21,9 +21,9 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('account_id', 'email', 'password1', 'password2', 'is_staff', 'is_active')}
+            'fields': ('id', 'email', 'password1', 'password2', 'is_staff', 'is_active')}
         ),
     )
 
-    search_fields = ('account_id', 'email')
+    search_fields = ('id', 'email')
 

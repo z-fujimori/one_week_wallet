@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 class UserManager(BaseUserManager):
     def _create_user(self, email, account_id, password, **extra_fields):
         email = self.normalize_email(email)
-        user = self.model(email=email, account_id=account_id, **extra_fields)
+        user = self.model(email=email, id=account_id, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
 
@@ -18,7 +18,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', False)
         return self._create_user(
             email=email,
-            account_id=account_id,
+            id=account_id,
             password=password,
             **extra_fields,
         )
@@ -29,14 +29,20 @@ class UserManager(BaseUserManager):
         extra_fields['is_superuser'] = True
         return self._create_user(
             email=email,
-            account_id=account_id,
+            id=account_id,
             password=password,
             **extra_fields,
         )
 
+class Prefectures(models.Model):
+    name = models.CharField(
+        verbose_name=("都道府県名(name)")
+    )
 
 class User(AbstractBaseUser, PermissionsMixin):
-
+    id = models.AutoField(
+        primary_key=True
+    )  # わかりやすさ重視でUUIDではなく連番
     email = models.EmailField(
         verbose_name=_("email"),
         unique=True
@@ -72,12 +78,29 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("updateded_at"),
         auto_now=True
     )
+    prefecture_id = models.ForeignKey(
+        Prefectures,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True
+    )
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'account_id' # ログイン時、ユーザー名の代わりにaccount_idを使用
+    USERNAME_FIELD = 'id' # ログイン時、ユーザー名の代わりにaccount_idを使用
     REQUIRED_FIELDS = ['email']  # スーパーユーザー作成時にemailも設定する
 
     def __str__(self):
-        return self.account_id
+        return self.id
 
+class BudgetSetting(models.Model):
+    max_weekly_limit = models.IntegerField(
+        verbose_name=("週間上限金額(max_weekly_limit)"),
+    )
+    monthly_buffer = models.IntegerField(
+        verbose_name=("月間予備金(monthly_buffer)"),
+    )
+    user_id = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
