@@ -1,23 +1,59 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'expenses/css/index.css' %}">
+{% endblock %}
+
 {% block content %}
-<div>
+<div class="expenses-body">
     <div class="expend-form">
-        <form action="#">
-            <div class="form-header"></div>
+        <form action="{% url 'expenses:create_expense' %}" method="post">
+            {% csrf_token %}
+            <div class="form-header">
+                <input type="date" value="{{ today }}" name="date">
+            </div>
             <div class="form-body">
                 <div class="input-main">
-                    <div class="input-title"></div>
-                    <div class="input-number"></div>
+                    <div class="input-title">
+                        <input type="text" name="title">
+                    </div>
+                    <div class="input-number">
+                        <input type="number" name="amount">
+                    </div>
                 </div>
-                <div class="form-button"></div>
+                <div class="form-button">
+                    <button>✒️</button>
+                </div>
             </div>
         </form>
     </div>
 
     <div class="week-calender">
-        <div></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>日付</th>
+                    <th>タイトル</th>
+                    <th>金額</th>
+                    <th>タグ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                    <tr>
+                        <td>{{ expense.date }}</td>
+                        <td>{{ expense.title }}</td>
+                        <td>{{ expense.amount }}円</td>
+                        <td>{{ expense.tag.name }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4">データがありません。</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
     <div class="control">

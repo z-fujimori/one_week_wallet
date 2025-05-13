@@ -78,7 +78,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name=_("updateded_at"),
         auto_now=True
     )
-    prefecture_id = models.ForeignKey(
+    prefecture = models.ForeignKey(
         Prefectures,
         on_delete=models.PROTECT,
         null=True,
@@ -100,7 +100,7 @@ class BudgetSetting(models.Model):
     monthly_buffer = models.IntegerField(
         verbose_name=("月間予備金(monthly_buffer)"),
     )
-    user_id = models.ForeignKey(
+    user = models.ForeignKey(
         User,
         on_delete=models.CASCADE
     )

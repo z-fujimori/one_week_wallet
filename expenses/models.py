@@ -31,13 +31,13 @@ class Expense(models.Model):
     date = models.DateField(
         verbose_name=("日付(date)")
     )
-    tag_id = models.ForeignKey(
+    tag = models.ForeignKey(
         Tag,
         on_delete=models.SET_NULL,
         null=True,
         blank=True
     )
-    user_id = models.ForeignKey(
+    user = models.ForeignKey(
         "accounts.User",
         on_delete=models.CASCADE
     )

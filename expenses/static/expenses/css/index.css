@@ -1,0 +1,31 @@
+.expenses-body {
+    width: 1200px;
+    margin: 0 auto;
+    
+}
+
+.expend-form {
+    margin: 0 auto;
+    width: 600px;
+    height: 200px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.form-body {
+    display: flex;
+    justify-content: space-around;
+}
+
+.input-main {
+    background-color: #ccc;
+    margin: 1 1;
+}
+
+.form-button {
+    background-color: #ccc;
+    margin: 1 1;
+    
+}
+
