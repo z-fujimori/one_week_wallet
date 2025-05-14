@@ -3,6 +3,8 @@
 
 {% block extra_css %}
     <link rel="stylesheet" href="{% static 'expenses/css/index.css' %}">
+    <!-- icon links -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 {% endblock %}
 
 {% block content %}
@@ -15,15 +17,17 @@
             </div>
             <div class="form-body">
                 <div class="input-main">
-                    <div class="input-title">
-                        <input type="text" name="title">
+                    <div class="input-field">
+                        <i class="fa-solid fa-tag input-icon"></i>
+                        <input class="input-area" type="text" name="title">
                     </div>
-                    <div class="input-number">
-                        <input type="number" name="amount">
+                    <div class="input-field">
+                        <i class="fa-solid fa-yen-sign input-icon"></i>
+                        <input class="input-area" type="number" name="amount">
                     </div>
                 </div>
                 <div class="form-button">
-                    <button>✒️</button>
+                    <button class=""><i class="fa-solid fa-pen"></i></button>
                 </div>
             </div>
         </form>
@@ -46,6 +50,27 @@
                         <td>{{ expense.title }}</td>
                         <td>{{ expense.amount }}円</td>
                         <td>{{ expense.tag.name }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4">データがありません。</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+        <table>
+            <thead>
+                <tr>
+                    <th>日付</th>
+                    <th>金額</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for date, total in daily_amount_total %}
+                    <tr>
+                        <td>{{ date }}</td>
+                        <td>{{ total }}円</td>
                     </tr>
                 {% empty %}
                     <tr>

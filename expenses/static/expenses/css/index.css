@@ -16,16 +16,46 @@
 .form-body {
     display: flex;
     justify-content: space-around;
+    margin: 5px 60px;
 }
 
 .input-main {
-    background-color: #ccc;
+    flex: 4;
     margin: 1 1;
+    background-color: rgb(247, 247, 247);
+}
+
+.input-field {
+    position: relative;
+    margin: 1px;
+}
+
+.input-icon {
+    position: absolute;
+    transform: translate(30%, 35%);
+    pointer-events: none;
+    /* width: 20px; */
+    font-size: 16px;
+}
+
+.input-area {
+    all: unset;
+    padding: 1px 1px 1px 20px;
+    width: 60%;
+    border-bottom: 2px solid #aeacac;
+}
+.input-area:focus {
+    border-bottom: 2px solid #7e7e7e;
 }
 
 .form-button {
-    background-color: #ccc;
+    flex: 1;
+    background-color: #b2d2a2;
     margin: 1 1;
-    
 }
 
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
