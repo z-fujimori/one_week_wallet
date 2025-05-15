@@ -5,17 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}One Week Wallet{% endblock %}</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'css/style.css' %}"> -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- 特定のテンプレートでCSSを読み込む場所 -->
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
     <header>
         <nav>
             <div class="container">
                 <div class="nav-content">
-                    <a href="{% url 'accounts:index' %}" class="logo">One Week Wallet</a>
+                    <a href="{% url 'expenses:index' %}" class="logo">One Week Wallet</a>
                     <div class="nav-links">
                         {% if user.is_authenticated %}
-                            <span class="welcome-message">ようこそ、{{ user.username }}さん</span>
+                            <span class="welcome-message">ようこそ、{{ user.name }}さん</span>
                             <a href="{% url 'accounts:logout' %}" class="nav-link">ログアウト</a>
                         {% else %}
                             <a href="{% url 'accounts:login' %}" class="nav-link">ログイン</a>
