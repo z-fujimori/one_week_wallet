@@ -7,10 +7,22 @@
 .expend-form {
     margin: 0 auto;
     width: 600px;
-    height: 200px;
+    height: 170px;
     border: 2px solid #ccc;
     border-radius: 8px;
     padding: 16px;
+}
+
+.input-date {
+    border: none;
+    margin: 0px 10px;
+    font-size: 18px;
+    border-bottom: 1px solid #aeacac;
+}
+.input-date:focus {
+    border: none;
+    outline: none;
+    border-bottom: 1px solid #5e5e5e;
 }
 
 .form-body {
@@ -22,36 +34,63 @@
 .input-main {
     flex: 4;
     margin: 1 1;
-    background-color: rgb(247, 247, 247);
 }
 
 .input-field {
     position: relative;
-    margin: 1px;
+    margin-top: 18px;
 }
 
 .input-icon {
     position: absolute;
-    transform: translate(30%, 35%);
     pointer-events: none;
     /* width: 20px; */
-    font-size: 16px;
+    font-size: 36px;
+    color: #aeacac;
+}
+.fa-tag {
+    transform: translate(30%, 30%);
+    font-size: 32px;
+}
+.fa-yen-sign {
+    transform: translate(40%, 20%);
 }
 
 .input-area {
-    all: unset;
-    padding: 1px 1px 1px 20px;
-    width: 60%;
+    all: unset;  /* これより上は無効化 */
+    font-size: 30px; 
+    padding: 1px 1px 1px 60px;
+    width: 70%;
+    height: 45px;
     border-bottom: 2px solid #aeacac;
 }
 .input-area:focus {
-    border-bottom: 2px solid #7e7e7e;
+    border-bottom: 2px solid #5e5e5e;
 }
 
 .form-button {
     flex: 1;
-    background-color: #b2d2a2;
+    flex-direction: column;
     margin: 1 1;
+    display: flex;
+}
+.form-button-spacer {
+    flex-grow: 1;
+}
+
+.pen-button {
+    background-color: white;
+    margin-top: auto;
+    margin-bottom: 10px;
+    width: 80px;
+    height: 40px;
+    font-size: 24px;
+    border: 2px solid #aeacac;
+    border-radius: 10px;
+}
+.pen-button:hover {
+    background-color: #f5f2f2;
+    border: 3px solid #5e5e5e;
 }
 
 input[type="number"]::-webkit-outer-spin-button,

@@ -13,21 +13,22 @@
         <form action="{% url 'expenses:create_expense' %}" method="post">
             {% csrf_token %}
             <div class="form-header">
-                <input type="date" value="{{ today }}" name="date">
+                <input class="input-date" type="date" value="{{ today }}" name="date"  required oninvalid="this.setCustomValidity('必須項目')"  oninput="this.setCustomValidity('')" >
             </div>
             <div class="form-body">
                 <div class="input-main">
                     <div class="input-field">
                         <i class="fa-solid fa-tag input-icon"></i>
-                        <input class="input-area" type="text" name="title">
+                        <input class="input-area" type="text" name="title" required oninvalid="this.setCustomValidity('必須項目')"  oninput="this.setCustomValidity('')">
                     </div>
                     <div class="input-field">
                         <i class="fa-solid fa-yen-sign input-icon"></i>
-                        <input class="input-area" type="number" name="amount">
+                        <input class="input-area" type="number" name="amount" required oninvalid="this.setCustomValidity('必須項目')"  oninput="this.setCustomValidity('')" >
                     </div>
                 </div>
                 <div class="form-button">
-                    <button class=""><i class="fa-solid fa-pen"></i></button>
+                    <div class="form-button-spacer"></div>
+                    <button class="pen-button"><i class="fa-solid fa-pen"></i></button>
                 </div>
             </div>
         </form>

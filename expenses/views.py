@@ -18,11 +18,14 @@ def index(request):
             date__range=(start, today)
         ).order_by('-date')
     
+    week_total = 0
     daily_amount = defaultdict(int)  # 未定義のインデックスが呼び出された場合にエラーにならない
     for expense in expenses:
         daily_amount[expense.date] += expense.amount
+        week_total += expense.amount
     # daily_amount_total = sorted(daily_amount.items())
     daily_amount_total = [( date, daily_amount[date] ) for date in this_week]
+    daily_amount_total.append(( "", week_total ))
 
     return render(request, "expenses/index.html",{
         "today": date.today().isoformat,
@@ -31,18 +34,19 @@ def index(request):
     })
 
 def create_expense(request):
-    print("print1")
     if request.method == 'POST':
-        print("print2")
+
         form = ExpenseForm(request.POST)
         if form.is_valid():
-            print("print3")
+    
             expense = form.save(commit=False)
             expense.user = request.user
             expense.save()
             return redirect('expenses:index')
     else:
-        print("print0")
+
         form = ExpenseForm()
         return redirect('expenses:index')
 
+def monthly(request):
+    return render(request, "expenses/monthly.html")
