@@ -4,8 +4,10 @@ from django.utils import timezone
 from .forms import ExpenseForm
 from .models import Expense
 from collections import defaultdict  # 配列の初期値設定
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+@login_required
 def index(request):
     today = timezone.localtime()
     weekday = (today.weekday()+1)%7
@@ -33,6 +35,7 @@ def index(request):
         "daily_amount_total": daily_amount_total
     })
 
+@login_required
 def create_expense(request):
     if request.method == 'POST':
 
@@ -50,3 +53,5 @@ def create_expense(request):
 
 def monthly(request):
     return render(request, "expenses/monthly.html")
+
+

@@ -10,18 +10,31 @@ class CustomUserCreationForm(UserCreationForm):
         model = User
         fields = ("id", "email", "name") 
 
-class CustomAuthenticationForm(AuthenticationForm):
-    username = forms.CharField(label="アカウントID")  # ラベル調整
+class CustomAuthenticationForm(forms.Form):
+    email = forms.EmailField(label="メールアドレス")
+    password = forms.CharField(label="パスワード", widget=forms.PasswordInput)
+
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request", None)
+        super().__init__(*args, **kwargs)
 
     def confirm_login_allowed(self, user):
         super().confirm_login_allowed(user)
 
-    def clean(self):
-        id = self.cleaned_data.get('name')
-        password = self.cleaned_data.get('password')
+    def get_user(self):
+        return self.user_cache
 
-        if id and password:
-            self.user_cache = authenticate(self.request, id=id, password=password)
+    def clean(self):
+        # id = self.cleaned_data.get('username')
+        email = self.cleaned_data.get('email')
+        password = self.cleaned_data.get('password')
+        print(self.cleaned_data)
+        print(" email:", email, " pass:", password)
+        print("request: ", self.request)
+        if email and password:
+            print("どど？")
+            self.user_cache = authenticate(username=email, password=password)
             if self.user_cache is None:
+                print("にのので？")
                 raise forms.ValidationError("ログイン情報が正しくありません")
         return self.cleaned_data

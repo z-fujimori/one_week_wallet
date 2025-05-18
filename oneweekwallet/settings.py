@@ -41,6 +41,12 @@ INSTALLED_APPS = [
 ]
 AUTH_USER_MODEL = "accounts.User"  # 追加
 
+# emailでログインしたい
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailBackend',
+    # 'django.contrib.auth.backends.ModelBackend',  # fallback
+]
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

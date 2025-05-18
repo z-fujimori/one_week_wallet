@@ -27,8 +27,13 @@ def signup_view(request):
 
 def login_view(request):
     if request.method == 'POST':
-        form = CustomAuthenticationForm(data=request.POST)
+        form = CustomAuthenticationForm(data=request.POST, request=request)
+        print("v")
+        print(form.is_valid())
+        print("エラー", form.errors)
+        print("^")
         if form.is_valid():
+            print("~~~")
             user = form.get_user()
             login(request, user)
             messages.success(request, 'ログインしました！')
@@ -42,3 +47,7 @@ def logout_view(request):
     logout(request)
     messages.info(request, 'ログアウトしました。')
     return redirect('accounts:login')
+
+@login_required
+def setting(request):
+    return render(request, 'accounts/setting.html')
