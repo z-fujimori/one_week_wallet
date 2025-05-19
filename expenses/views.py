@@ -6,19 +6,24 @@ from .models import Expense
 from collections import defaultdict  # 配列の初期値設定
 from django.contrib.auth.decorators import login_required
 
+WEEKDAYS_JP = ['月', '火', '水', '木', '金', '土', '日']
+
 # Create your views here.
 @login_required
 def index(request):
-    today = timezone.localtime()
+    today = timezone.localtime().replace(hour=0, minute=0, second=0, microsecond=0)
     weekday = (today.weekday()+1)%7
     print(weekday)
     start = today - timedelta(days=weekday) 
     this_week = [(start + timedelta(days=i)).date() for i in range(7)]
+    end = today + timedelta(days=6-weekday)
 
     expenses = Expense.objects.filter(
             user=request.user,
-            date__range=(start, today)
+            date__range=(start, end)
         ).order_by('-date')
+    
+    print(type(this_week[0]))
     
     week_total = 0
     daily_amount = defaultdict(int)  # 未定義のインデックスが呼び出された場合にエラーにならない
@@ -26,8 +31,8 @@ def index(request):
         daily_amount[expense.date] += expense.amount
         week_total += expense.amount
     # daily_amount_total = sorted(daily_amount.items())
-    daily_amount_total = [( date, daily_amount[date] ) for date in this_week]
-    daily_amount_total.append(( "", week_total ))
+    daily_amount_total = [( date, WEEKDAYS_JP[date.weekday()], daily_amount[date] ) for date in this_week]
+    daily_amount_total.append(("", "", week_total ))
 
     return render(request, "expenses/index.html",{
         "today": date.today().isoformat,

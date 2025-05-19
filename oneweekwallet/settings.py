@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "accounts",  # 追加
     "expenses",  # 忘れてた
+    'django.contrib.humanize'  # 桁区切り
 ]
 AUTH_USER_MODEL = "accounts.User"  # 追加
 
