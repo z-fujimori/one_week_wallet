@@ -160,6 +160,9 @@ td {
     max-width: 400px;
     text-align: center;
     position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
 }
 .close-button {
     position: absolute;

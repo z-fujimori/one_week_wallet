@@ -5,6 +5,7 @@ from .forms import ExpenseForm
 from .models import Expense
 from collections import defaultdict  # 配列の初期値設定
 from django.contrib.auth.decorators import login_required
+import json
 
 WEEKDAYS_JP = ['月', '火', '水', '木', '金', '土', '日']
 
@@ -23,21 +24,38 @@ def index(request):
             date__range=(start, end)
         ).order_by('-date')
     
-    print(type(this_week[0]))
+    expense_data = defaultdict(list)
     
     week_total = 0
     daily_amount = defaultdict(int)  # 未定義のインデックスが呼び出された場合にエラーにならない
     for expense in expenses:
         daily_amount[expense.date] += expense.amount
         week_total += expense.amount
+        expense_data[expense.date.isoformat()].append(expense)
     # daily_amount_total = sorted(daily_amount.items())
-    daily_amount_total = [( date, WEEKDAYS_JP[date.weekday()], daily_amount[date] ) for date in this_week]
+    daily_amount_total = [( date.isoformat(), WEEKDAYS_JP[date.weekday()], daily_amount[date] ) for date in this_week]
     daily_amount_total.append(("", "", week_total ))
 
+    expense_data_serialized = {
+        date: [
+            {
+                "id": e.id,
+                "title": e.title,
+                "amount": e.amount,
+                "tag": e.tag.name if e.tag else None,
+                "date": e.date.isoformat()
+            }
+            for e in expense_list
+        ]
+        for date, expense_list in expense_data.items()
+    }
+
     return render(request, "expenses/index.html",{
-        "today": date.today().isoformat,
-        "expenses": expenses,
-        "daily_amount_total": daily_amount_total
+        "today": date.today().isoformat(),
+        "expenses": expense_data,
+        "daily_amount_total": daily_amount_total,
+        # "datas": {"expenses": expense_data}
+        "datas": json.dumps({"expenses": expense_data_serialized}, ensure_ascii=False)
     })
 
 @login_required

@@ -28,13 +28,8 @@ class CustomAuthenticationForm(forms.Form):
         # id = self.cleaned_data.get('username')
         email = self.cleaned_data.get('email')
         password = self.cleaned_data.get('password')
-        print(self.cleaned_data)
-        print(" email:", email, " pass:", password)
-        print("request: ", self.request)
         if email and password:
-            print("どど？")
             self.user_cache = authenticate(username=email, password=password)
             if self.user_cache is None:
-                print("にのので？")
                 raise forms.ValidationError("ログイン情報が正しくありません")
         return self.cleaned_data

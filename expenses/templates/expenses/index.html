@@ -63,7 +63,6 @@
         </table>
     </div>
 
-
     <!-- <hr>
     <table>
         <thead>
@@ -108,22 +107,41 @@
     const modalContent = document.getElementById("modalContent");
     const closeBtn = document.querySelector(".close-button");
 
+    const expensesStr = '{{ datas | escapejs }}'
+    const parsedExpenses = JSON.parse(expensesStr);
+    console.log(parsedExpenses)
+    let expenses = parsedExpenses.expenses
+
     // モーダルを開く関数
     function openModal(date) {
         if (date=="") { return }
-        console.log(date)
+        console.log("date", date)
+        console.log("expenses", expenses[date])
         modalContent.innerHTML = `
-            <div>
-                <button class="close-button" onclick="cleseModal()">x</button>
-            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>タイトル</th>
+                        <th>金額</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${expenses[date].map((ex) => `<tr><td>${ex.title}</td><td>${ex.amount}円</td></tr>`).join("")}
+                </tbody>
+            </table>
+
+            <button class="close-button" onclick="closeModal()">×</button>
         `;
+        // for (d in datas) {
+        //     modalContent.innerHTML
+        // }
 
         // 閉じるボタンを再バインド
         // modalContent.querySelector(".close-button").addEventListener("click", closeModal);
         modal.classList.remove("hidden");
     }
 
-    function cleseModal() {
+    function closeModal() {
         modal.classList.add("hidden");
     }
 
