@@ -33,3 +33,8 @@ class CustomAuthenticationForm(forms.Form):
             if self.user_cache is None:
                 raise forms.ValidationError("ログイン情報が正しくありません")
         return self.cleaned_data
+    
+
+class SettingForm(forms.Form):
+    title = forms.CharField(max_length=100)
+    amount = forms.IntegerField(min_value=0)
