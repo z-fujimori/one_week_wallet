@@ -8,6 +8,8 @@
 {% endblock %}
 
 {% block content %}
+{% load humanize %}
+<!-- ^ 数字桁区切り -->
 <div class="expenses-body">
     <div class="expend-form">
         <form action="{% url 'expenses:create_expense' %}" method="post">
@@ -28,64 +30,140 @@
                 </div>
                 <div class="form-button">
                     <div class="form-button-spacer"></div>
-                    <button class="pen-button"><i class="fa-solid fa-pen"></i></button>
+                    <button type="submit" class="pen-button"><i class="fa-solid fa-pen"></i></button>
                 </div>
             </div>
         </form>
     </div>
 
+    <hr>
+
     <div class="week-calender">
-        <table>
-            <thead>
-                <tr>
-                    <th>日付</th>
-                    <th>タイトル</th>
-                    <th>金額</th>
-                    <th>タグ</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for expense in expenses %}
-                    <tr>
-                        <td>{{ expense.date }}</td>
-                        <td>{{ expense.title }}</td>
-                        <td>{{ expense.amount }}円</td>
-                        <td>{{ expense.tag.name }}</td>
-                    </tr>
+        <table border="1" class="week-calender-table" style="border-collapse: collapse; overflow: hidden;" >
+            <tr class="week-calender-title">
+                {% for date, week_day, total in daily_amount_total %}
+                    <th onclick="openModal('{{date}}')">
+                        <div style="font-size: 12px;">{{ date }}</div>
+                        <div style="font-size: 19px;">{{ week_day }}</div>
+                    </th>
                 {% empty %}
-                    <tr>
-                        <td colspan="4">データがありません。</td>
-                    </tr>
+                    <td colspan="8">データがありません。</td>
                 {% endfor %}
-            </tbody>
-        </table>
-        <hr>
-        <table>
-            <thead>
-                <tr>
-                    <th>日付</th>
-                    <th>金額</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for date, total in daily_amount_total %}
-                    <tr>
-                        <td>{{ date }}</td>
-                        <td>{{ total }}円</td>
-                    </tr>
+            </tr>
+            <tr class="week-calender-value">
+                {% for date, week_day, total in daily_amount_total %}
+                    <!-- <td>{{ date }}</td> -->
+                    <td  style="width: 100px;" onclick="openModal('{{date}}')">
+                        {{ total | intcomma }}円
+                    </td>
                 {% empty %}
-                    <tr>
-                        <td colspan="4">データがありません。</td>
-                    </tr>
+                    <td colspan="8">データがありません。</td>
                 {% endfor %}
-            </tbody>
+            </tr>
         </table>
     </div>
 
+    <!-- <hr>
+    <table>
+        <thead>
+            <tr>
+                <th>日付</th>
+                <th>タイトル</th>
+                <th>金額</th>
+                <th>タグ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+                <tr>
+                    <td>{{ expense.date }}</td>
+                    <td>{{ expense.title }}</td>
+                    <td>{{ expense.amount }}円</td>
+                    <td>{{ expense.tag.name }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">データがありません。</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table> -->
+
     <div class="control">
-        <div class="control-return"></div>
-        <div class="control-title"></div>
-        <div class="control-improve"></div>
+        <div class="control-return"><button><</button></div>
+        <div class="control-title"> 〜 </div>
+        <div class="control-improve"><button>></button></div>
+    </div>
+
+    <!-- モーダル -->
+    <div id="myModal" class="modal hidden"  >
+        <div class="modal-content" id="modalContent">
+        </div>
     </div>
 </div>
+
+<script>
+    const modal = document.getElementById("myModal");
+    const modalContent = document.getElementById("modalContent");
+    const closeBtn = document.querySelector(".close-button");
+
+    const expensesStr = '{{ datas | escapejs }}'
+    const parsedExpenses = JSON.parse(expensesStr);
+    console.log(parsedExpenses)
+    let expenses = parsedExpenses.expenses
+
+    // モーダルを開く関数
+    function openModal(date) {
+        if (date=="") { return }
+        console.log("date", date)
+        console.log("expenses", expenses[date])
+        modalContent.innerHTML = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>タイトル</th>
+                        <th>金額</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${expenses[date].map((ex) => `<tr><td>${ex.title}</td><td>${ex.amount}円</td></tr>`).join("")}
+                </tbody>
+            </table>
+
+            <button class="close-button" onclick="closeModal()">×</button>
+        `;
+        // for (d in datas) {
+        //     modalContent.innerHTML
+        // }
+
+        // 閉じるボタンを再バインド
+        // modalContent.querySelector(".close-button").addEventListener("click", closeModal);
+        modal.classList.remove("hidden");
+    }
+
+    function closeModal() {
+        modal.classList.add("hidden");
+    }
+
+    // 閉じる
+    modal.addEventListener("click", () => {
+        modal.classList.add("hidden");
+    });
+    modalContent.addEventListener("click", (e) => {
+        // 親要素にイベントが伝播しないようにする
+        e.stopPropagation();
+    });
+
+    // closeBtn.addEventListener("click", () => {
+    //     modal.classList.add("hidden");
+    // });
+
+
+    // // 背景クリックで閉じる
+    // window.addEventListener("click", (e) => {
+    //     if (e.target === modal) {
+    //         modal.classList.add("hidden");
+    //     }
+    // });
+</script>
 {% endblock %}

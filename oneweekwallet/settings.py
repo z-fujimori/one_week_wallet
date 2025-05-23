@@ -38,8 +38,15 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "accounts",  # 追加
     "expenses",  # 忘れてた
+    'django.contrib.humanize'  # 桁区切り
 ]
 AUTH_USER_MODEL = "accounts.User"  # 追加
+
+# emailでログインしたい
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailBackend',
+    # 'django.contrib.auth.backends.ModelBackend',  # fallback
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
