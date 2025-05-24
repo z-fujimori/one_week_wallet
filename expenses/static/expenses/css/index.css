@@ -137,8 +137,16 @@ td {
     justify-content: space-between;
     padding-left: 90px;
     padding-right: 90px;
+    margin-top: 20px;
 }
-
+.control-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #5e5e5e;
+}
+.control-title span {
+    margin: 0 10px;
+}
 /* モーダル */
 .modal {
     position: fixed;
@@ -166,8 +174,8 @@ td {
 }
 .close-button {
     position: absolute;
-    right: 1rem;
-    top: 0.5rem;
+    right: 0.8rem;
+    top: 0.8rem;
     font-size: 24px;
     cursor: pointer;
 }
