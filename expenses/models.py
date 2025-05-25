@@ -41,5 +41,3 @@ class Expense(models.Model):
         "accounts.User",
         on_delete=models.CASCADE
     )
-
-

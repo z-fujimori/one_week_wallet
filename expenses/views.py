@@ -21,7 +21,6 @@ def index(request):
     else:
         today = timezone.localtime().replace(hour=0, minute=0, second=0, microsecond=0)
     weekday = (today.weekday()+1)%7
-    print(weekday)
     start = today - timedelta(days=weekday) 
     this_week = [(start + timedelta(days=i)).date() for i in range(7)]
     end = today + timedelta(days=6-weekday)
@@ -137,7 +136,6 @@ def create_expense(request):
 
         form = ExpenseForm(request.POST)
         if form.is_valid():
-    
             expense = form.save(commit=False)
             expense.user = request.user
             expense.save()

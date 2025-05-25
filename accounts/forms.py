@@ -2,6 +2,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
+from .models import BudgetSetting
 
 User = get_user_model()
 
@@ -35,6 +36,7 @@ class CustomAuthenticationForm(forms.Form):
         return self.cleaned_data
     
 
-class SettingForm(forms.Form):
-    title = forms.CharField(max_length=100)
-    amount = forms.IntegerField(min_value=0)
+class SettingForm(forms.ModelForm):
+    class Meta:
+        model = BudgetSetting
+        fields = ["max_weekly_limit", "monthly_buffer"]

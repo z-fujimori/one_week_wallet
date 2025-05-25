@@ -2,9 +2,16 @@
 {% load static %}
 
 {% block extra_css %}
+<!-- fullcalendar -->
+<!-- <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.min.css" rel="stylesheet"> -->
 {% endblock %}
 
 {% block content %}
+
+
+<div id="calendar"></div>
+
+
 <div id="calendar"></div>
 <script>
     const now = new Date();
@@ -24,6 +31,6 @@
 
     html += "</tr></table>";
     document.getElementById("calendar").innerHTML = html;
+    
 </script>
-
 {% endblock %}
