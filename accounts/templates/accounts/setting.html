@@ -8,7 +8,7 @@
 {% block content %}
 
 <div class="setting-body">
-    <form action="{% url 'accounts:setting' %}" method="POST" >
+    <form action="{% url 'accounts:setting' %}" method="POST">
         {% csrf_token %}
         <div class="input-field">
             <label for="max_weekly_limit">週間予算</label>

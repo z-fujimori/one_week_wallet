@@ -9,8 +9,6 @@ from django.contrib.auth.decorators import login_required
 import json
 from django.http import JsonResponse
 
-
-
 WEEKDAYS_JP = ['月', '火', '水', '木', '金', '土', '日']
 
 # Create your views here.
@@ -69,7 +67,8 @@ def index(request):
         "expenses": expense_data_serialized,
         "daily_amount_total": daily_amount_total,
         # "datas": {"expenses": expense_data}
-        "datas": json.dumps({"expenses": expense_data_serialized}, ensure_ascii=False)
+        "datas": json.dumps({"expenses": expense_data_serialized}, ensure_ascii=False),
+        "nav_weekly_monthly": "weekly"
     })
 
 @login_required
@@ -146,5 +145,40 @@ def create_expense(request):
         return redirect('expenses:index')
 
 def monthly(request):
-    return render(request, "expenses/monthly.html")
+    today = date.today()
+    first = today.replace(day=1)  # 今月ついたちを取得
+    start = first - timedelta(days=(first.weekday()+1)%7)  
+
+    calendar_days = [(start + timedelta(days=i)) for i in range(35)]
+    calendar_days_serialized = [day.strftime("%Y-%m-%d") for day in calendar_days]
+
+    end = start + timedelta(days=35)
+    expenses = Expense.objects.filter(
+        user=request.user,
+        date__range=(start, end)
+    ).order_by('-date') 
+
+    expense_amount = defaultdict(int)
+    for expense in expenses:
+        expense_amount[expense.date.strftime("%Y-%m-%d")] += expense.amount
+    
+    # 7日ごとに分割
+    expense_monthly_amount = []
+    week_data = []
+    for i, day in enumerate(calendar_days_serialized):
+        week_data.append([day, expense_amount[day]])
+        if (i + 1) % 7 == 0:  # 7日ごとに区切る
+            expense_monthly_amount.append(week_data)
+            week_data = []
+    # 最後の週が7日未満の場合も追加
+    if week_data:
+        expense_monthly_amount.append(week_data)
+
+    context = {
+        "nav_weekly_monthly": "monthly",
+        "today": today.strftime("%Y-%m-%d"),
+        "calendar_days": calendar_days_serialized,
+        "expense_monthly_amount": expense_monthly_amount
+    }
+    return render(request, "expenses/monthly.html", context)
 
