@@ -49,6 +49,10 @@
                 {% empty %}
                     <td colspan="8">データがありません。</td>
                 {% endfor %}
+                <th onclick="openModal('{{date}}','{{expenses}}')">
+                    <div style="font-size: 12px;">{{ max_weekly_limit }}</div>
+                    <!-- <div style="font-size: 19px;">{{ week_total }}</div> -->
+                </th>
             </tr>
             <tr class="week-calender-value">
                 {% for date, week_day, total in daily_amount_total %}
@@ -59,6 +63,9 @@
                 {% empty %}
                     <td colspan="8">データがありません。</td>
                 {% endfor %}
+                    <td  style="width: 100px; {% if diff_amount < 0 %}color: red; {% else %}color: green; {% endif %}" onclick="openModal('{{date}}','{{expenses}}')">
+                        {{ diff_amount | intcomma }}円
+                    </td>
             </tr>
         </table>
     </div>

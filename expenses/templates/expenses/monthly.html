@@ -4,10 +4,12 @@
 {% block extra_css %}
 <!-- fullcalendar -->
 <!-- <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.min.css" rel="stylesheet"> -->
+<link rel="stylesheet" href="{% static 'expenses/css/monthly.css' %}">
 {% endblock %}
 
 {% block content %}
-
+{% load humanize %}
+<!-- ^ 数字桁区切り -->
 <div class="monthly-calendar">
     <table class="monthly-calendar-table" border="1" style="border-collapse: collapse; overflow: hidden;">
         <tr class="monthly-calendar-header">
@@ -18,16 +20,25 @@
             <th>木</th>
             <th>金</th>
             <th>土</th>
+            <th>
+                <div>buffer</div>
+                <div>{{ monthly_buffer }}</div>
+            </th>
         </tr>
         <tr class="monthly-calendar-body">
-            {% for week in expense_monthly_amount %}
+            {% for week, max_weekly_limit, diff_amount in zipped_data %}
                 <tr>
                     {% for day, amount in week %}
                         <td>
                             <div class="calendar-cell-day">{{ day }}</div>
-                            <div class="calendar-cell-amount">{{ amount }}</div>
+                            {% if amount > 0 %}
+                                <div class="calendar-cell-amount">{{ amount|intcomma }}円</div>
+                            {% endif %}
                         </td>
                     {% endfor %}
+                    <td>
+                        <div>{{ diff_amount }}</div>
+                    </td>
                 </tr>
             {% endfor %}
     </table>

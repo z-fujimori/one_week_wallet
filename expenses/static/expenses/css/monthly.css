@@ -1,0 +1,32 @@
+.monthly-calendar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.monthly-calendar-table {
+    margin: 0 auto;
+}
+
+td{
+    width: 100px;
+    height: 100px;
+    position: relative;
+    text-align: right;
+    
+}
+
+.calendar-cell-day{
+    position: absolute;
+    top: 0;
+    left: 3px;
+}
+
+.calendar-cell-amount{
+    font-size: 20px;
+    font-weight: bold;
+    padding-right: 3px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
