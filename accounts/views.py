@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+from django.contrib import messages 
+from .models import BudgetSetting
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, SettingForm
 
 # Create your views here.
@@ -10,16 +11,13 @@ def index(request):
     return render(request, "accounts/index.html")
 
 def signup_view(request):
-    print("debug1")
     if request.method == 'POST':
-        print("debug2")
         form = CustomUserCreationForm(request.POST)
-        print("debug3")
         if form.is_valid():
-            print("debug4")
             user = form.save()
             login(request, user)
             messages.success(request, 'アカウントを作成しました！')
+            BudgetSetting.objects.create(user=user)
             return redirect('accounts:index')
     else:
         form = CustomUserCreationForm()
@@ -28,12 +26,7 @@ def signup_view(request):
 def login_view(request):
     if request.method == 'POST':
         form = CustomAuthenticationForm(data=request.POST, request=request)
-        print("v")
-        print(form.is_valid())
-        print("エラー", form.errors)
-        print("^")
         if form.is_valid():
-            print("~~~")
             user = form.get_user()
             login(request, user)
             messages.success(request, 'ログインしました！')
@@ -49,21 +42,32 @@ def logout_view(request):
     return redirect('accounts:login')
 
 @login_required
-def setting(request):
-    return render(request, 'accounts/setting.html')
-
-@login_required
 def settingStore(request):
     if request.method == "POST":
-        form = SettingFrom(request.POST)
+        # 既存の設定を取得
+        budget_setting = BudgetSetting.objects.filter(user=request.user).first()
+        if budget_setting:
+            # 更新の場合
+            form = SettingForm(request.POST, instance=budget_setting)
+        else:
+            # 新規作成の場合
+            form = SettingForm(request.POST)
+            
         if form.is_valid():
-            # cleaned_dataから取得
-            title = form.cleaned_data['title']
-            amount = form.cleaned_data['amount']
-            ...
-            return redirect("somewhere")
+            budget_setting = form.save(commit=False)
+            budget_setting.user = request.user
+            budget_setting.save()
+            messages.success(request, '予算設定を更新しました！')
+            return redirect('expenses:index')
+        else:
+            userData = BudgetSetting.objects.filter(user=request.user).first()
+            return render(request, 'accounts/setting.html', {
+                'max_weekly_limit': userData.max_weekly_limit if userData else 0,
+                'monthly_buffer': userData.monthly_buffer if userData else 0
+            })
     else:
-        form = SettingFrom()
-
-    return render(request, "myapp/form.html", {"form": form})
-
+        userData = BudgetSetting.objects.filter(user=request.user).first()
+        return render(request, 'accounts/setting.html', {
+                'max_weekly_limit': userData.max_weekly_limit if userData else 0,
+                'monthly_buffer': userData.monthly_buffer if userData else 0
+            })

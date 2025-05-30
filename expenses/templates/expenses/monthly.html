@@ -2,28 +2,52 @@
 {% load static %}
 
 {% block extra_css %}
+<!-- fullcalendar -->
+<!-- <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.min.css" rel="stylesheet"> -->
+<link rel="stylesheet" href="{% static 'expenses/css/monthly.css' %}">
 {% endblock %}
 
 {% block content %}
-<div id="calendar"></div>
+{% load humanize %}
+<!-- ^ 数字桁区切り -->
+<div class="monthly-calendar">
+    <table class="monthly-calendar-table" border="1" style="border-collapse: collapse; overflow: hidden;">
+        <tr class="monthly-calendar-header">
+            <th>日</th>
+            <th>月</th>
+            <th>火</th>
+            <th>水</th>
+            <th>木</th>
+            <th>金</th>
+            <th>土</th>
+            <th>
+                <div>buffer</div>
+                <div>{{ monthly_buffer }}</div>
+            </th>
+        </tr>
+        <tr class="monthly-calendar-body">
+            {% for week, max_weekly_limit, diff_amount in zipped_data %}
+                <tr>
+                    {% for day, amount in week %}
+                        <td>
+                            <div class="calendar-cell-day">{{ day }}</div>
+                            {% if amount > 0 %}
+                                <div class="calendar-cell-amount">{{ amount|intcomma }}円</div>
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                    <td>
+                        <div>{{ diff_amount }}</div>
+                    </td>
+                </tr>
+            {% endfor %}
+    </table>
+</div>
+
+
+
 <script>
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth(); // 0-based
 
-    const firstDay = new Date(year, month, 1).getDay();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    let html = "<table border='1'><tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr><tr>";
-
-    for (let i = 0; i < firstDay; i++) html += "<td></td>";
-    for (let d = 1; d <= daysInMonth; d++) {
-        html += `<td>${d}</td>`;
-        if ((firstDay + d) % 7 === 0) html += "</tr><tr>";
-    }
-
-    html += "</tr></table>";
-    document.getElementById("calendar").innerHTML = html;
+    
 </script>
-
 {% endblock %}

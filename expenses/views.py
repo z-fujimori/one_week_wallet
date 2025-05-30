@@ -4,12 +4,11 @@ from django.utils import timezone
 from datetime import datetime
 from .forms import ExpenseForm
 from .models import Expense
+from accounts.models import BudgetSetting
 from collections import defaultdict  # 配列の初期値設定
 from django.contrib.auth.decorators import login_required
 import json
 from django.http import JsonResponse
-
-
 
 WEEKDAYS_JP = ['月', '火', '水', '木', '金', '土', '日']
 
@@ -21,7 +20,6 @@ def index(request):
     else:
         today = timezone.localtime().replace(hour=0, minute=0, second=0, microsecond=0)
     weekday = (today.weekday()+1)%7
-    print(weekday)
     start = today - timedelta(days=weekday) 
     this_week = [(start + timedelta(days=i)).date() for i in range(7)]
     end = today + timedelta(days=6-weekday)
@@ -41,7 +39,7 @@ def index(request):
         expense_data[expense.date.isoformat()].append(expense)
     # daily_amount_total = sorted(daily_amount.items())
     daily_amount_total = [( date.strftime("%m-%d"), WEEKDAYS_JP[date.weekday()], daily_amount[date] ) for date in this_week]
-    daily_amount_total.append(("", "", week_total ))
+    # daily_amount_total.append(("", "", week_total ))
 
     expense_data_serialized = {
         date: [
@@ -57,6 +55,12 @@ def index(request):
         for date, expense_list in expense_data.items()
     }
 
+    # 予算設定
+    budgetSetting = BudgetSetting.objects.get(user=request.user)
+    max_weekly_limit = budgetSetting.max_weekly_limit
+    # 今月残量
+    diff_amount = budgetSetting.max_weekly_limit - week_total
+
     return render(request, "expenses/index.html",{
         "sun_day": this_week[0].strftime("%m-%d"),
         "sat_day": this_week[6].strftime("%m-%d"),
@@ -70,7 +74,11 @@ def index(request):
         "expenses": expense_data_serialized,
         "daily_amount_total": daily_amount_total,
         # "datas": {"expenses": expense_data}
-        "datas": json.dumps({"expenses": expense_data_serialized}, ensure_ascii=False)
+        "datas": json.dumps({"expenses": expense_data_serialized}, ensure_ascii=False),
+        "nav_weekly_monthly": "weekly",
+        "week_total": week_total,
+        "max_weekly_limit": max_weekly_limit,
+        "diff_amount": diff_amount
     })
 
 @login_required
@@ -137,7 +145,6 @@ def create_expense(request):
 
         form = ExpenseForm(request.POST)
         if form.is_valid():
-    
             expense = form.save(commit=False)
             expense.user = request.user
             expense.save()
@@ -147,6 +154,70 @@ def create_expense(request):
         form = ExpenseForm()
         return redirect('expenses:index')
 
+@login_required
 def monthly(request):
-    return render(request, "expenses/monthly.html")
+    today = date.today()
+    first = today.replace(day=1)  # 今月ついたちを取得
+    start = first - timedelta(days=(first.weekday()+1)%7)  
 
+    calendar_days = [(start + timedelta(days=i)) for i in range(35)]
+    calendar_days_serialized = [day.strftime("%m/%d") for day in calendar_days]
+
+    end = start + timedelta(days=35)
+    expenses = Expense.objects.filter(
+        user=request.user,
+        date__range=(start, end)
+    ).order_by('-date') 
+
+    expense_amount = defaultdict(int)
+    for expense in expenses:
+        expense_amount[expense.date.strftime("%m/%d")] += expense.amount
+
+    # 予算設定
+    budgetSetting = BudgetSetting.objects.get(user=request.user)
+    max_weekly_limit = budgetSetting.max_weekly_limit
+    monthly_buffer = budgetSetting.monthly_buffer
+    
+    # 7日ごとに分割
+    expense_monthly_amount = []
+    week_data = []
+    week_total = 0
+    week_totals = []
+    diff_amount = 0
+    diff_amounts = []
+    current_month_count = 0
+    max_weekly_limits = []
+    for i, day in enumerate(calendar_days_serialized):
+        week_data.append([day, expense_amount[day]])
+        week_total += expense_amount[day]
+        if day[:2] == today.strftime("%m"):
+            current_month_count += 1
+        if (i + 1) % 7 == 0:  # 7日ごとに区切る
+            diff_amount = max_weekly_limit - week_total
+            print(diff_amount, (current_month_count/7))
+            diff_amounts.append(int(diff_amount * (current_month_count/7)))
+            diff_amount = 0
+            week_totals.append(int(week_total * (current_month_count/7)))
+            week_total = 0
+            max_weekly_limits.append(int(max_weekly_limit * (current_month_count/7)))
+            expense_monthly_amount.append(week_data)
+            week_data = []
+            current_month_count  = 0
+    # 最後の週が7日未満の場合も追加
+    if week_data:
+        expense_monthly_amount.append(week_data)
+
+    zipped_data = zip(expense_monthly_amount, max_weekly_limits, diff_amounts)
+
+    context = {
+        "nav_weekly_monthly": "monthly",
+        "today": today.strftime("%m/%d"),
+        "calendar_days": calendar_days_serialized,
+        "expense_monthly_amount": expense_monthly_amount,
+        "week_totals": week_totals,
+        "diff_amounts": diff_amounts,
+        "max_weekly_limits": max_weekly_limits,
+        "monthly_buffer": monthly_buffer,
+        "zipped_data": zipped_data
+    }
+    return render(request, "expenses/monthly.html", context)

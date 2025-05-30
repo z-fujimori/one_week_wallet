@@ -96,9 +96,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 class BudgetSetting(models.Model):
     max_weekly_limit = models.IntegerField(
         verbose_name=("週間上限金額(max_weekly_limit)"),
+        default=0
     )
     monthly_buffer = models.IntegerField(
         verbose_name=("月間予備金(monthly_buffer)"),
+        default=0
     )
     user = models.ForeignKey(
         User,

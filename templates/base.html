@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}One Week Wallet{% endblock %}</title>
     {% load static %}
-    <!-- <link rel="stylesheet" href="{% static 'css/style.css' %}"> -->
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
     <!-- 特定のテンプレートでCSSを読み込む場所 -->
+    <!-- fullcalendar
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/main.min.css" rel="stylesheet"> -->
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -16,9 +18,17 @@
             <div class="container">
                 <div class="nav-content">
                     <a href="{% url 'expenses:index' %}" class="logo">One Week Wallet</a>
+
+                    {% if nav_weekly_monthly %}
+                    <div class="nav-weekly-monthly">
+                        <a class="nav-weekly {% if nav_weekly_monthly == 'weekly' %}nav-selected{% else %}nav-unselected{% endif %}" href="{% url 'expenses:index' %}">weekly</a>
+                        <a class="nav-monthly {% if nav_weekly_monthly == 'monthly' %}nav-selected{% else %}nav-unselected{% endif %}" href="{% url 'expenses:monthly' %}">monthly</a>
+                    </div>
+                    {% endif %}
+                    
                     <div class="nav-links">
                         {% if user.is_authenticated %}
-                            <span class="welcome-message">ようこそ、{{ user.name }}さん</span>
+                            <a href="{% url 'accounts:setting' %}"><span class="welcome-message">{{ user.name }}さんの予算設定</span></a>
                             <a href="{% url 'accounts:logout' %}" class="nav-link">ログアウト</a>
                         {% else %}
                             <a href="{% url 'accounts:login' %}" class="nav-link">ログイン</a>
@@ -44,11 +54,14 @@
         {% block content %}
         {% endblock %}
     </main>
-
+    
+    {% block extra_js %}{% endblock %}
+    
     <footer>
         <div class="container">
             <p>&copy; 2024 One Week Wallet. All rights reserved.</p>
         </div>
     </footer>
+
 </body>
 </html> 
