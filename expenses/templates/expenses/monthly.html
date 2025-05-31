@@ -11,6 +11,15 @@
 {% load humanize %}
 <!-- ^ 数字桁区切り -->
 <div class="monthly-calendar">
+
+    <div>
+        <div>{{this_month}}月</div>
+        <div>
+            <div>{{sum_max_weekly_limits}} - {{month_total}}</div>
+            <div>{{sum_total_diff}}</div>
+        </div>
+    </div>
+
     <table class="monthly-calendar-table" border="1" style="border-collapse: collapse; overflow: hidden;">
         <tr class="monthly-calendar-header">
             <th>日</th>
@@ -21,8 +30,7 @@
             <th>金</th>
             <th>土</th>
             <th>
-                <div>buffer</div>
-                <div>{{ monthly_buffer }}</div>
+                <div>buffer:<span>{{ monthly_buffer }}</span></div>
             </th>
         </tr>
         <tr class="monthly-calendar-body">
@@ -37,7 +45,7 @@
                         </td>
                     {% endfor %}
                     <td>
-                        <div>{{ diff_amount }}</div>
+                        <div>{{ diff_amount }}円</div>
                     </td>
                 </tr>
             {% endfor %}
