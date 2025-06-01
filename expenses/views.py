@@ -38,7 +38,7 @@ def index(request):
         week_total += expense.amount
         expense_data[expense.date.isoformat()].append(expense)
     # daily_amount_total = sorted(daily_amount.items())
-    daily_amount_total = [( date.strftime("%m-%d"), WEEKDAYS_JP[date.weekday()], daily_amount[date] ) for date in this_week]
+    daily_amount_total = [( date.strftime("%Y-%m-%d"), WEEKDAYS_JP[date.weekday()], daily_amount[date] ) for date in this_week]
     # daily_amount_total.append(("", "", week_total ))
 
     expense_data_serialized = {
@@ -60,6 +60,7 @@ def index(request):
     max_weekly_limit = budgetSetting.max_weekly_limit
     # 今月残量
     diff_amount = budgetSetting.max_weekly_limit - week_total
+    expenses_json = json.dumps(expense_data_serialized)
 
     return render(request, "expenses/index.html",{
         "sun_day": this_week[0].strftime("%m-%d"),
@@ -72,6 +73,7 @@ def index(request):
         "next_sat_day": (this_week[6] + timedelta(days=7)).strftime("%m-%d"),
         "today": date.today().isoformat(),
         "expenses": expense_data_serialized,
+        # "expenses": expenses_json,
         "daily_amount_total": daily_amount_total,
         # "datas": {"expenses": expense_data}
         "datas": json.dumps({"expenses": expense_data_serialized}, ensure_ascii=False),

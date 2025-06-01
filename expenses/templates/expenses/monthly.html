@@ -12,11 +12,13 @@
 <!-- ^ 数字桁区切り -->
 <div class="monthly-calendar">
 
-    <div>
-        <div>{{this_month}}月</div>
-        <div>
-            <div>{{sum_max_weekly_limits}} - {{month_total}}</div>
-            <div>{{sum_total_diff}}</div>
+    <div class="month-head">
+        <div class="month-month">{{this_month}}月</div>
+        <div class="month-spase"></div>
+        <div class="month-money">
+            <div class="month-money-calc">{{sum_max_weekly_limits}} - {{month_total}}</div>
+            <div class="month-money-total" style="{% if sum_total_diff < 0 %}color: red; {% else %}color: green; {% endif %}" onclick="openModal('{{date}}','{{expenses}}')"
+            >{{sum_total_diff}}</div>
         </div>
     </div>
 
@@ -44,8 +46,8 @@
                             {% endif %}
                         </td>
                     {% endfor %}
-                    <td>
-                        <div>{{ diff_amount }}円</div>
+                    <td style="{% if diff_amount < 0 %}color: red; {% else %}color: green; {% endif %}" onclick="openModal('{{date}}','{{expenses}}')">
+                        <div class="calendar-cell-diff">{{ diff_amount }}円</div>
                     </td>
                 </tr>
             {% endfor %}
