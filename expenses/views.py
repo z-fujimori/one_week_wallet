@@ -38,7 +38,7 @@ def index(request):
         week_total += expense.amount
         expense_data[expense.date.isoformat()].append(expense)
     # daily_amount_total = sorted(daily_amount.items())
-    daily_amount_total = [( date.strftime("%m-%d"), WEEKDAYS_JP[date.weekday()], daily_amount[date] ) for date in this_week]
+    daily_amount_total = [( date.strftime("%Y-%m-%d"), WEEKDAYS_JP[date.weekday()], daily_amount[date] ) for date in this_week]
     # daily_amount_total.append(("", "", week_total ))
 
     expense_data_serialized = {
@@ -60,6 +60,7 @@ def index(request):
     max_weekly_limit = budgetSetting.max_weekly_limit
     # 今月残量
     diff_amount = budgetSetting.max_weekly_limit - week_total
+    expenses_json = json.dumps(expense_data_serialized)
 
     return render(request, "expenses/index.html",{
         "sun_day": this_week[0].strftime("%m-%d"),
@@ -72,6 +73,7 @@ def index(request):
         "next_sat_day": (this_week[6] + timedelta(days=7)).strftime("%m-%d"),
         "today": date.today().isoformat(),
         "expenses": expense_data_serialized,
+        # "expenses": expenses_json,
         "daily_amount_total": daily_amount_total,
         # "datas": {"expenses": expense_data}
         "datas": json.dumps({"expenses": expense_data_serialized}, ensure_ascii=False),
@@ -183,23 +185,30 @@ def monthly(request):
     week_data = []
     week_total = 0
     week_totals = []
-    diff_amount = 0
-    diff_amounts = []
+    month_total = 0
+    week_diff_amount = 0
+    week_diff_amounts = []
     current_month_count = 0
     max_weekly_limits = []
     for i, day in enumerate(calendar_days_serialized):
-        week_data.append([day, expense_amount[day]])
-        week_total += expense_amount[day]
+        day_amount_in_thismonth = 0
         if day[:2] == today.strftime("%m"):
+            day_amount_in_thismonth = expense_amount[day]
+            month_total += day_amount_in_thismonth
             current_month_count += 1
+        
+        week_total += day_amount_in_thismonth
+        week_data.append([day, day_amount_in_thismonth])
         if (i + 1) % 7 == 0:  # 7日ごとに区切る
-            diff_amount = max_weekly_limit - week_total
-            print(diff_amount, (current_month_count/7))
-            diff_amounts.append(int(diff_amount * (current_month_count/7)))
-            diff_amount = 0
-            week_totals.append(int(week_total * (current_month_count/7)))
+            thisweek_max_limit_in_thismonth = int(max_weekly_limit * (current_month_count/7))
+            week_diff_amount = thisweek_max_limit_in_thismonth - week_total
+            week_diff_amounts.append(week_diff_amount)
+            # week_diff_amounts.append(week_diff_amount)
+            week_diff_amount = 0
+            # week_totals.append(int(week_total * (current_month_count/7)))
+            week_totals.append(week_total)
             week_total = 0
-            max_weekly_limits.append(int(max_weekly_limit * (current_month_count/7)))
+            max_weekly_limits.append(thisweek_max_limit_in_thismonth)
             expense_monthly_amount.append(week_data)
             week_data = []
             current_month_count  = 0
@@ -207,17 +216,26 @@ def monthly(request):
     if week_data:
         expense_monthly_amount.append(week_data)
 
-    zipped_data = zip(expense_monthly_amount, max_weekly_limits, diff_amounts)
+    sum_diff_amounts = sum(week_diff_amounts)
+    sum_max_weekly_limits = sum(max_weekly_limits)
+    sum_total_diff = sum_max_weekly_limits - month_total
+
+
+    zipped_data = zip(expense_monthly_amount, max_weekly_limits, week_diff_amounts)
 
     context = {
         "nav_weekly_monthly": "monthly",
-        "today": today.strftime("%m/%d"),
+        "this_month": today.strftime("%m"),
         "calendar_days": calendar_days_serialized,
         "expense_monthly_amount": expense_monthly_amount,
         "week_totals": week_totals,
-        "diff_amounts": diff_amounts,
+        "diff_amounts": week_diff_amounts,
+        "sum_diff_amounts": sum_diff_amounts,
         "max_weekly_limits": max_weekly_limits,
+        "sum_max_weekly_limits": sum_max_weekly_limits,
         "monthly_buffer": monthly_buffer,
-        "zipped_data": zipped_data
+        "zipped_data": zipped_data,
+        "sum_total_diff": sum_total_diff,
+        "month_total": month_total
     }
     return render(request, "expenses/monthly.html", context)

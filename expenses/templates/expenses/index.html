@@ -42,28 +42,28 @@
         <table border="1" class="week-calender-table" style="border-collapse: collapse; overflow: hidden;" >
             <tr class="week-calender-title">
                 {% for date, week_day, total in daily_amount_total %}
-                    <th onclick="openModal('{{date}}','{{expenses}}')">
+                    <th onclick="openModal('{{date}}')">
                         <div style="font-size: 12px;">{{ date }}</div>
                         <div style="font-size: 19px;">{{ week_day }}</div>
                     </th>
                 {% empty %}
                     <td colspan="8">データがありません。</td>
                 {% endfor %}
-                <th onclick="openModal('{{date}}','{{expenses}}')">
-                    <div style="font-size: 12px;">{{ max_weekly_limit }}</div>
+                <th onclick="openModal('{{date}}')">
+                    <div style="font-size: 18px;">残り</div>
                     <!-- <div style="font-size: 19px;">{{ week_total }}</div> -->
                 </th>
             </tr>
             <tr class="week-calender-value">
                 {% for date, week_day, total in daily_amount_total %}
                     <!-- <td>{{ date }}</td> -->
-                    <td  style="width: 100px;" onclick="openModal('{{date}}','{{expenses}}')">
+                    <td  style="width: 100px;" onclick="openModal('{{date}}')">
                         {{ total | intcomma }}円
                     </td>
                 {% empty %}
                     <td colspan="8">データがありません。</td>
                 {% endfor %}
-                    <td  style="width: 100px; {% if diff_amount < 0 %}color: red; {% else %}color: green; {% endif %}" onclick="openModal('{{date}}','{{expenses}}')">
+                    <td  style="width: 100px; {% if diff_amount < 0 %}color: red; {% else %}color: green; {% endif %}" onclick="openModal('{{date}}')">
                         {{ diff_amount | intcomma }}円
                     </td>
             </tr>
@@ -100,10 +100,14 @@
     let expenses = parsedExpenses.expenses
 
     // モーダルを開く関数
-    function openModal(date,ex) {
+    function openModal(date) {
         if (date=="") { return }
         console.log("date", date)
-        console.log("expenses", JSON.parse(ex).expenses)
+        console.log("ex", expenses)
+        console.log("ex-type", typeof expenses);
+        // console.log("expenses", JSON.parse(ex).expenses)
+        let exp = expenses[date]
+        console.log("exp-type", exp)
         modalContent.innerHTML = `
             <div class="modal-content-header">
                 <div class="modal-content-header-title">
@@ -118,7 +122,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    ${expenses[date].map((ex) => `<tr><td>${ex.title}</td><td>${ex.amount}円</td></tr>`).join("")}
+                    ${exp.map((ex) => `<tr><td>${ex.title}</td><td>${ex.amount}円</td></tr>`).join("")}
                 </tbody>
             </table>
 
