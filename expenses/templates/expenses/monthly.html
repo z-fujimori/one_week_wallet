@@ -52,12 +52,28 @@
                 </tr>
             {% endfor %}
     </table>
+
+    <div class="month-control">
+        <div >
+            <button onclick="changeCalender('{{befor}}')">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span></span>
+            </button>
+        </div>
+        <div>
+            <button onclick="changeCalender('{{next}}')">
+                <span></span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
 </div>
 
 
 
 <script>
-
-    
+    async function changeCalender(date) {
+        window.location.href = `?day=${date}`;
+    }
 </script>
 {% endblock %}

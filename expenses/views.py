@@ -60,7 +60,6 @@ def index(request):
     max_weekly_limit = budgetSetting.max_weekly_limit
     # 今月残量
     diff_amount = budgetSetting.max_weekly_limit - week_total
-    expenses_json = json.dumps(expense_data_serialized)
 
     return render(request, "expenses/index.html",{
         "sun_day": this_week[0].strftime("%m-%d"),
@@ -86,10 +85,7 @@ def index(request):
 @login_required
 def get_week_data(request):
     standard_day = datetime.strptime(request.GET.get("day"), "%Y-%m-%d")
-    print("-------------------------------------------------")
-    print(standard_day)
     weekday = (standard_day.weekday()+1)%7
-    print(weekday)
     start = standard_day - timedelta(days=weekday) 
     this_week = [(start + timedelta(days=i)).date() for i in range(7)]
     end = standard_day + timedelta(days=6-weekday)
@@ -158,8 +154,13 @@ def create_expense(request):
 
 @login_required
 def monthly(request):
-    today = date.today()
+    if request.GET.get("day"):
+        today = datetime.strptime(request.GET.get("day"), "%Y-%m-%d")
+    else:
+        today = date.today()
     first = today.replace(day=1)  # 今月ついたちを取得
+    befor = first - timedelta(days=1)
+    next = today.replace(day=28) + timedelta(days=5)
     start = first - timedelta(days=(first.weekday()+1)%7)  
 
     calendar_days = [(start + timedelta(days=i)) for i in range(35)]
@@ -236,6 +237,9 @@ def monthly(request):
         "monthly_buffer": monthly_buffer,
         "zipped_data": zipped_data,
         "sum_total_diff": sum_total_diff,
-        "month_total": month_total
+        "month_total": month_total,
+        "befor": befor.strftime("%Y-%m-%d"),
+        "next": next.strftime("%Y-%m-%d")
     }
     return render(request, "expenses/monthly.html", context)
+
